@@ -1,0 +1,22 @@
+<thead>
+    <tr>
+        <th class="border">Prompt ID</th>
+        <th class="border">Prompt</th>
+        <th class="border">GT Answer</th>
+        <th class="border">LLM Response</th>
+        <th class="border">Test status</th>
+        <th class="border">Score</th>
+    </tr>
+</thead>
+<tbody>
+    {% for item in data %}
+<tr>
+    <td class="border">{{ item["prompt_id"] }}</td>
+    <td class="border">{{ item["prompt"] }}</td>
+    <td class="border">{{ item["metadata"]["gt_answer"] }}</td>
+    <td class="border">{{ item["llm_response"] }}</td>
+    <td class="border">{{ item["status"] }}</td>
+    <td class="border">{{ "%.4f"|format(item["score"]|float) }}</td>
+</tr>
+{% endfor %}
+</tbody>

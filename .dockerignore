@@ -1,0 +1,5 @@
+.idea
+venv
+
+docker-compose.yaml
+orchestrator/Dockerfile

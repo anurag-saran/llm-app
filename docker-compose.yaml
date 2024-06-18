@@ -1,0 +1,59 @@
+version: '3.8'
+
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "${DB_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb-data:/data/mongo_client
+
+  mongo-express:
+      image: mongo-express
+      restart: always
+      environment:
+        ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:-mongodb}:${DB_PORT:-27017}
+      ports:
+        - "8181:8081"
+      depends_on:
+        - mongodb
+
+  detector-toxicity:
+    build:
+      context: ./detectors/toxicity
+    ports:
+      - "8081:80"
+    environment:
+      WORKERS: 1
+
+  detector-relevance:
+    build:
+      context: ./detectors/relevance
+    ports:
+      - "8082:80"
+    environment:
+      WORKERS: 1
+
+  detector-hallucinations:
+    build:
+      context: ./detectors/hallucinations
+    ports:
+      - "8083:80"
+    environment:
+      WORKERS: 1
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
+  detector-privacy:
+    build:
+      context: ./detectors/privacy
+    ports:
+      - "8084:80"
+    environment:
+      WORKERS: 1
+
+volumes:
+  mongodb-data:

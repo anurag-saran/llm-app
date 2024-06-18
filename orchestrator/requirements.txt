@@ -1,0 +1,9 @@
+asyncclick
+httpx
+openai >= 1.16.1
+huggingface_hub
+aiohttp
+pydantic-settings
+motor==3.4.0
+tenacity
+jinja2

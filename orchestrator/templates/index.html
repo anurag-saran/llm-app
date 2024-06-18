@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .header {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .model, .detector {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            margin-left: 10%;
+        }
+        .logo {
+            height: 40px; /* Adjust based on your actual logo size */
+            margin-left: 10%;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-left: 10%;
+            margin-right: 10%;
+            margin-bottom: 40px;
+        }
+        th, td {
+            border-bottom: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        .border {
+            border-left: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+        }
+        .total {
+            background-color: #f9f9f9;
+        }
+        th {
+            background-color: #f9f9f9; /* Light grey background */
+            font-weight: normal;
+            text-align: center;
+        }
+        td {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <img src="data:image/png;base64,{{ base64_logo }}" alt="Logo" class="logo">
+    <div class="header">LLM Benchmarking Report</div>
+    <div class="model">Model: {{ model }}</div>
+
+    <table class="overall">
+            <thead>
+                <tr>
+                    {% if debug %}
+                        <th>Detector (click to view detailed report)</th>
+                    {% else %}
+                        <th>Detector</th>
+                    {% endif %}
+                    <th>Total tests</th>
+                    <th>Tests passed</th>
+                    <th>Tests skipped</th>
+                    <th>Tests failed</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% set _ = namespace() %}
+            {% set _.total_tests = 0 %}
+            {% set _.total_passed = 0 %}
+            {% set _.total_skipped = 0 %}
+            {% set _.total_failed = 0 %}
+
+            {% for metric, data in detectors.items() %}
+            <tr class="main_tr">
+                {% if debug %}
+                        <td><a href="#detector-{{ metric }}">{{ metric.capitalize() }}</a></td>
+                    {% else %}
+                        <td>{{ metric.capitalize() }}</td>
+                    {% endif %}
+                <td>{{ data["total"] }}</td>
+                <td>{{ data["passed"] }} - ({{ data["passed_percentage"] }})</td>
+                <td>{{ data["skipped"] }} - ({{ data["skipped_percentage"] }})</td>
+                <td>{{ data["failed"] }} - ({{ data["failed_percentage"] }})</td>
+
+                    {% set _.total_tests = _.total_tests + data["total"] %}
+                    {% set _.total_passed = _.total_passed + data["passed"] %}
+                    {% set _.total_skipped = _.total_skipped + data["skipped"] %}
+                    {% set _.total_failed = _.total_failed + data["failed"] %}
+
+            </tr>
+            {% endfor %}
+            <tr>
+            <th>Total</th>
+            <td class="total">{{ _.total_tests }}</td>
+            {% if _.total_tests > 0 %}
+                <td class="total">{{ _.total_passed }} - ({{ (_.total_passed / _.total_tests * 100) | round(2) }}%)</td>
+                <td class="total">{{ _.total_skipped }} - ({{ (_.total_skipped / _.total_tests * 100) | round(2) }}%)</td>
+                <td class="total">{{ _.total_failed }} - ({{ (_.total_failed / _.total_tests * 100) | round(2) }}%)</td>
+            {% else %}
+                <td>0 (0%)</td>
+                <td>0 (0%)</td>
+                <td>0 (0%)</td>
+            {% endif %}
+            </tr>
+            </tbody>
+    </table>
+        {% if debug %}
+            {% for detector, data in detectors.items() %}
+        <div class="detector" id="detector-{{ detector }}">Detector: {{ detector.capitalize() }}</div>
+        <table>
+            {% with data = data.benchmark_data %}
+                {% include detector + ".html"  %}
+            {% endwith %}
+        </table>
+            {% endfor %}
+        {% endif %}
+</body>
+</html>

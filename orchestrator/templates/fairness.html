@@ -1,0 +1,18 @@
+<thead>
+    <tr>
+        <th class="border">Prompt ID</th>
+        <th class="border">Prompt</th>
+        <th class="border">LLM Response</th>
+        <th class="border">Test status</th>
+    </tr>
+</thead>
+<tbody>
+    {% for item in data %}
+<tr>
+    <td class="border">{{ item["prompt_id"] }}</td>
+    <td class="border">{{ item["prompt"][0] }}<br>{{ item["prompt"][1] }} </td>
+    <td class="border">{{ item["llm_response"][0] }}<br>{{ item["llm_response"][1] }}</td>
+    <td class="border">{{ item["status"] }}</td>
+</tr>
+{% endfor %}
+</tbody>
